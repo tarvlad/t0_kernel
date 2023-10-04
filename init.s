@@ -20,15 +20,47 @@ sti
 ; kernel data segment setup
 mov ax, 0x2000
 mov ds, ax
-
-
-; buffer for read setup, 0x7E00 - 0x8000, 1 sector from floppy
-mov ax, 0x7E0
 mov es, ax
+
 
 ; read 384 KiB == 768 sectors, need 128 reads before segment
 ; register shift up on 0x1000, what give up on 64KiB
+; there will be 6 segments shiftup
+; there will be 1536 reads by 512 bytes, segment shiftup will be
+; every 128 reads
 
+xor si, si
+xor ax, ax
+xor dh, dh
+xor cx, cx
+xor bx, bx
+read_kernel:
+inc cx
+cmp cx, 0x13
+jne .chs_addr_normalize_end
+mov cx, 0x1
+inc dh
+cmp dh, 0x3
+jne .chs_addr_normalize_end
+xor dh, dh
+inc ax
+.chs_addr_normalize_end:
+call read_sector
+add bx, 0x200
+test bx, bx
+jnz .segment_normalize_end
+push ax
+mov ax, es
+add ax, 0x1000
+mov es, ax
+pop ax
+.segment_normalize_end:
+inc si
+cmp si, 0x600              ; 1536
+jne read_kernel
+
+mov ax, 0x2000
+mov ds, ax
 
 cli 
 hlt
@@ -41,7 +73,7 @@ push ax
 push dx
 push cx
 mov cx, ax
-shl cx, 0x6                 ; cyllinder
+shl cx, 0x6                 ; cylinder 
 pop ax                      ; because [sp] cannot be done
 or cx, ax                   ; sector
 push ax
