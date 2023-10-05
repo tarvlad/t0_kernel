@@ -32,13 +32,13 @@ mov es, ax
 xor si, si
 xor ax, ax
 xor dh, dh
-xor cx, cx
+xor cl, cl
 xor bx, bx
 read_kernel:
-inc cx
-cmp cx, 0x13
+inc cl
+cmp cl, 0x13
 jne .chs_addr_normalize_end
-mov cx, 0x1
+mov cl, 0x1
 inc dh
 cmp dh, 0x2
 jne .chs_addr_normalize_end
@@ -62,32 +62,28 @@ jne read_kernel
 mov ax, 0x2000
 mov ds, ax
 
+mov ax, 0xFFFF
 cli 
 hlt
 
 
-; reads sector (ax, dh, cx) from floppy with number in dl
+; reads sector (ax, dh, cl) from floppy with number in dl
 ; to es:bx
 read_sector:
-push ax
 push cx
-mov cx, ax
-shl cx, 0x6                 ; cylinder 
-pop ax                      ; because [sp] cannot be done
-or cx, ax                   ; sector
 push ax
-mov ah, 0x2                 ; read from floppy
-mov al, 0x1                 ; 1 sector
+mov ch, al
+shr ax, 0x2
+and al, 0xC0
+or cl, al
+mov ah, 0x2
+mov al, 0x1
 int 0x13
 jc .error
-pop cx
 pop ax
+pop cx
 ret
 .error:
-mov ax, 0x0BAD
-mov bx, 0x0BAD
-mov cx, 0x0BAD
-mov dx, 0x0013
 cli 
 hlt
 
