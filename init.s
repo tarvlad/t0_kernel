@@ -4,8 +4,7 @@
 
 ; kernel stack located from 0x20000 down to 0x18000, 8 KiB
 ; kernel data located from 0x20000 up to 0x80000, 384 KiB
-; boot sector code loaded to 0x7D00 up to 0x7C00, 512 bytes
-
+; boot sector code loaded to 0x7C00 up to 0x7D00, 512 bytes
 
 [ BITS 16 ]
 
@@ -56,11 +55,18 @@ mov es, ax
 pop ax
 .segment_normalize_end:
 inc si
-cmp si, 0x300              ; 768
+cmp si, 0x300               ; 768
 jne read_kernel
 
 mov ax, 0x2000
 mov ds, ax
+
+cli                     
+lgdt [gdt_descriptor]
+mov eax, cr0
+or eax, 0x1
+mov cr0, eax
+jmp KMOD_CODE_SEG:protected_mode_tramplin + 0x7C00
 
 mov ax, 0xFFFF
 cli 
@@ -87,6 +93,34 @@ ret
 cli 
 hlt
 
+gdt_begin:
+dq 0x0
+gdt_kmod_code:
+dq 0x00CF9A000000FFFF
+gdt_kmod_data:
+dq 0x00CF92000000FFFF
+gdt_end:
+
+gdt_descriptor:
+dw gdt_end - gdt_begin - 1
+dd gdt_begin + 0x20000
+
+
+KMOD_CODE_SEG equ gdt_kmod_code - gdt_begin
+KMOD_DATA_SEG equ gdt_kmod_data - gdt_begin
+
+
+[BITS 32]
+protected_mode_tramplin:
+mov ax, KMOD_DATA_SEG
+mov ds, ax
+mov ss, ax
+mov es, ax
+mov fs, ax
+mov gs, ax
+mov eax, 0x20000
+mov esp, eax
+jmp KMOD_CODE_SEG:0x20200
 
 times 510-($-$$) db 0x0 
 dw 0xAA55                   ; boot sector signature
