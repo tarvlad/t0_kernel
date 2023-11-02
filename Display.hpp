@@ -30,41 +30,60 @@ struct DisplaySymbol {
 static_assert(sizeof(DisplaySymbol) == 2, "");
 
 
+// WARNING: LOW LEVEL API, FOR USUAL PRINT USE DisplayPrinter
 class Display {
     constexpr static unsigned _vgaMemBegin = 0xB8000;
     constexpr static unsigned _vgaMemSize = 0xB8FA0 - 0xB8000;
-    constexpr static unsigned _numColumns = 25;
-    constexpr static unsigned _numRows = 80;
+    constexpr static unsigned _numColumns = 80;
+    constexpr static unsigned _numRows = 25;
+    constexpr static unsigned _tabSize = 4;
 
-    unsigned _getSymbolAddress(unsigned x, unsigned y) {
+    static unsigned _getSymbolAddress(unsigned x, unsigned y) {
         return _vgaMemBegin + 2 * (y * 80 + x);
     }
 
 public:
-    unsigned numColumns() const {
+    static unsigned tabSize() {
+        return _tabSize;
+    }
+
+    static unsigned numColumns() {
         return _numColumns;
     }
 
-    unsigned numRows() const {
+    static unsigned numRows() {
         return _numRows;
     }
 
-    unsigned numElements() const {
+    static unsigned numElements() {
         return numColumns() * numRows();
     }
 
-    void clearScreen() {
+    static void clearScreen() {
         static_assert(_vgaMemSize % 4 == 0, "");
         for (unsigned i = 0; i < numElements(); i++) {
             reinterpret_cast<DisplaySymbol *>(_vgaMemBegin)[i].code = 0;
         }
     }
 
-    void printChar(char symbol, unsigned x, unsigned y) {
+    static void printChar(unsigned x, unsigned y, char symbol) {
         reinterpret_cast<DisplaySymbol *>(_getSymbolAddress(x, y))->code = symbol;
     }
 
-    void printStr(char *str, unsigned x, unsigned y) {
+    static void printString(unsigned x, unsigned y, const char *str, unsigned length) {
+        for (unsigned i = 0; i < length; i++) {
+            reinterpret_cast<DisplaySymbol *>(_getSymbolAddress(x, y))[i].code = str[i];
+        }
+    }
 
+    static void shiftOneLineUp() {
+        DisplaySymbol *memory = reinterpret_cast<DisplaySymbol *>(_vgaMemBegin);
+
+        for (unsigned i = 0; i < numElements() - numColumns(); i++) {
+            memory[i] = memory[i + numColumns()];
+        }
+        for (unsigned i = numElements() - numColumns(); i < numElements(); i++) {
+            memory[i].code = 0;
+        }
     }
 };

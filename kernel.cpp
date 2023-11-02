@@ -1,14 +1,19 @@
-#include "Display.hpp"
+#include "DisplayPrinter.hpp"
 
 static_assert(sizeof(int) == 4, "ERROR: DONT RUN IT ON PDP-11 PLS");
 static_assert(sizeof(short) == 2, "");
 static_assert(sizeof(char) == 1, "");
 
+
 [[noreturn]]
 extern "C" void main() {
-    Display display;
-    display.clearScreen();
+    DisplayPrinter display;
+    for (unsigned i = 0; i < 30; i++) {
+        for (unsigned j = 0; j < i; j++) {
+            display << ' ';
+        }
+        display << i << ' ' << "there is a string content :D" << '\n';
+    }
 
-    display.printChar('A', 0, 1);
     for(;;);
 }
