@@ -2,6 +2,7 @@
 
 #include "String.hpp"
 #include "PureVirtual.hpp"
+#include "IOManip.hpp"
 
 class Printer {
     
@@ -13,4 +14,6 @@ public:
     virtual Printer &operator<<(const String &str) __PURE_VIRT;
 
     virtual Printer &operator<<(const char *str) __PURE_VIRT;
+
+    virtual Printer &operator<<(NumPrintModifier modifier) __PURE_VIRT;
 };
