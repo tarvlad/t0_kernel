@@ -111,15 +111,21 @@ public:
         unsigned bufferElementsUsed = 0;
         switch (modifier_) {
         case DEC: {
-            constexpr unsigned maxNumDigitsInUnsigned = 10; //4 294 967 295 - 10 digits
+            constexpr unsigned maxNumDigitsInUnsigned = 10; 
+                //4 294 967 295 - 10 digits
             char buffer[maxNumDigitsInUnsigned];
 
             while (num > 0) {
-                buffer[maxNumDigitsInUnsigned - ++bufferElementsUsed] = num % 10 + asciiAlign;
+                buffer[maxNumDigitsInUnsigned - ++bufferElementsUsed] 
+                    = num % 10 + asciiAlign;
                 num /= 10;
             }
 
-            for (unsigned i = maxNumDigitsInUnsigned - bufferElementsUsed; i < maxNumDigitsInUnsigned; i++) {
+            for (
+                unsigned i = maxNumDigitsInUnsigned - bufferElementsUsed; 
+                i < maxNumDigitsInUnsigned; 
+                i++
+            ) {
                 (*this) << buffer[i];
             }
             break;
@@ -128,16 +134,22 @@ public:
             (*this) << "0x";
         }
         case HEX: {
-            constexpr unsigned maxNumDigitsInUnsignedHex = 8; // 0x FF FF FF FF - 8 digits
+            constexpr unsigned maxNumDigitsInUnsignedHex = 8; 
+                // 0x FF FF FF FF - 8 digits
             char buffer[maxNumDigitsInUnsignedHex];
             constexpr unsigned asciiAdditionalAlignForHexLetter = 0x41 - 0x3A;
 
             while (num > 0) {
-                buffer[maxNumDigitsInUnsignedHex - ++bufferElementsUsed] = num % 0x10;
+                buffer[maxNumDigitsInUnsignedHex - ++bufferElementsUsed] 
+                    = num % 0x10;
                 num /= 0x10;
             }
 
-            for (unsigned i = maxNumDigitsInUnsignedHex - bufferElementsUsed; i < maxNumDigitsInUnsignedHex; i++) {
+            for (
+                unsigned i = maxNumDigitsInUnsignedHex - bufferElementsUsed; 
+                i < maxNumDigitsInUnsignedHex; 
+                i++
+            ) {
                 if (buffer[i] > 9) {
                     buffer[i] += asciiAdditionalAlignForHexLetter;
                 }
@@ -154,11 +166,16 @@ public:
             char buffer[maxNumBitsInUnsigned];
 
             while (num > 0) {
-                buffer[maxNumBitsInUnsigned - ++bufferElementsUsed] = num % 2 + asciiAlign;
+                buffer[maxNumBitsInUnsigned - ++bufferElementsUsed] 
+                    = num % 2 + asciiAlign;
                 num >>= 1;
             }
 
-            for (unsigned i = maxNumBitsInUnsigned - bufferElementsUsed; i < maxNumBitsInUnsigned; i++) {
+            for (
+                unsigned i = maxNumBitsInUnsigned - bufferElementsUsed; 
+                i < maxNumBitsInUnsigned; 
+                i++
+            ) {
                 (*this) << buffer[i];
             }
             break;
