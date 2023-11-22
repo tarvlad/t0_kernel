@@ -1,9 +1,7 @@
 #pragma once
 
 #include "DisplayPrinter.hpp"
-
-typedef unsigned char byte;
-static_assert(sizeof(byte) == 1, "");
+#include "Misc.hpp"
 
 class Heap {
     constexpr static unsigned _heapBeginAddr = 0x100000;
@@ -11,11 +9,9 @@ class Heap {
     constexpr static unsigned _heapSize = _heapEndAddr - _heapBeginAddr;
     constexpr static unsigned _heapBlockSize = 512;
     constexpr static unsigned _heapSectorFree = 0xFFFFFFFF;
-    constexpr static unsigned _numHeapSectors = 
-        _heapSize / (_heapBlockSize + 4);
+    constexpr static unsigned _numHeapSectors = _heapSize / (_heapBlockSize + 4);
     constexpr static unsigned _heapSectorsHeadersOffset = 4 * _numHeapSectors;
-    constexpr static unsigned _heapDataBeginAddr = 
-        _heapBeginAddr + _heapSectorsHeadersOffset;
+    constexpr static unsigned _heapDataBeginAddr = _heapBeginAddr + _heapSectorsHeadersOffset;
 
     //Zero-initialized for store in .bss in mid-object kernel file
     inline static unsigned *_heapBlocksHeaders = nullptr;
@@ -24,18 +20,15 @@ class Heap {
 public:
     static void viewConstants(DisplayPrinter *printer) {
         *printer << DEC 
-            << 
-"======================================================================\n"
+            << "======================================================================\n"
             << "HeapBeginAddr = " << _heapBeginAddr << '\n'
             << "HeapEndAddr = " << _heapEndAddr << '\n'
             << "HeapSize = " << _heapSize << '\n'
             << "HeapSectorFreeFlag = " << _heapSectorFree << '\n'
             << "NumHeapSectors = " << _numHeapSectors << '\n'
-            << "HeapSectorsHeadersOffset = " << 
-                _heapSectorsHeadersOffset << '\n'
+            << "HeapSectorsHeadersOffset = " << _heapSectorsHeadersOffset << '\n'
             << "HeapDataBeginAddr = " << _heapDataBeginAddr << '\n'
-            << 
-"======================================================================\n";
+            << "======================================================================\n";
     }
 
     static void initHeap() {

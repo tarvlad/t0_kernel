@@ -67,19 +67,12 @@ public:
     }
 
     static void printChar(unsigned x, unsigned y, char symbol) {
-        reinterpret_cast<DisplaySymbol *>(
-                _getSymbolAddress(x, y)
-        )->code = symbol;
+        reinterpret_cast<DisplaySymbol *>(_getSymbolAddress(x, y))->code = symbol;
     }
 
-    static void printString(
-            unsigned x, unsigned y, 
-            const char *str, unsigned length
-    ) {
+    static void printString(unsigned x, unsigned y, const char *str, unsigned length) {
         for (unsigned i = 0; i < length; i++) {
-            reinterpret_cast<DisplaySymbol *>(
-                    _getSymbolAddress(x, y)
-            )[i].code = str[i];
+            reinterpret_cast<DisplaySymbol *>(_getSymbolAddress(x, y))[i].code = str[i];
         }
     }
 
@@ -89,11 +82,7 @@ public:
         for (unsigned i = 0; i < numElements() - numColumns(); i++) {
             memory[i] = memory[i + numColumns()];
         }
-        for (
-            unsigned i = numElements() - numColumns(); 
-            i < numElements(); 
-            i++
-        ) {
+        for (unsigned i = numElements() - numColumns(); i < numElements(); i++) {
             memory[i].code = 0;
         }
     }
