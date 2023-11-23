@@ -18,6 +18,10 @@ class Heap {
     inline static byte *_heapDataHeaders = nullptr;
 
 public:
+    constexpr static unsigned blockSize() {
+        return _heapBlockSize;
+    }
+
     static void viewConstants(DisplayPrinter *printer) {
         *printer << DEC 
             << "======================================================================\n"

@@ -4,21 +4,86 @@
 #include "DisplayPrinter.hpp"
 #include "IOManip.hpp"
 #include "Misc.hpp"
+#include "Heap.hpp"
+
+
+enum GateType : byte {
+    INTERRUPT_GATE = 0xE, // I/O and syscalls
+    TRAP_GATE = 0xF // exceptions
+};
+
+
+enum DplState : byte {
+    CORE = 0
+};
+
+
+enum TableIndex : byte {
+    GDT = 0,
+    LDT = 1
+};
+
+
+enum RPL : byte {
+    RING_0 = 0,
+    RING_1 = 1,
+    RING_2 = 2,
+    RING_3 = 3
+};
+
+
+struct SegmentSelector {
+    unsigned short privilegeLevel : 2;
+    unsigned short tableIndex : 1;
+    unsigned short index : 13;
+};
+static_assert(sizeof(SegmentSelector) == 2, "");
+
+
+struct GateDescriptor {
+    unsigned short offsetLow;
+    unsigned short segSelector;
+    byte zeroGap;
+    byte gateType : 4;
+    byte zeroGap1 : 1;
+    byte dpl : 2;
+    byte presentBit : 1;
+    unsigned short offsetHigh;
+};
+static_assert(sizeof(GateDescriptor) == 8, "");
+
+
+#pragma pack(push, 1)
+struct IDTDescriptor {
+    unsigned short idtSize;
+    unsigned idtAddr;
+};
+#pragma pack(pop)
+static_assert(sizeof(IDTDescriptor) == 6, "");
 
 
 class InterruptHandler {
+    inline static unsigned _gateDescriptorsAddr = 0;
 
 public:
+    static void idtLoad(unsigned idtAddr);
+
+
     static void kernelPanic(byte vector) {
         DisplayPrinter panicPrinter;
-        panicPrinter << HEX_WITH_PREFIX << "Unhandled interrupt: " << static_cast<unsigned>(vector) << '\n';
+        panicPrinter 
+            << HEX_WITH_PREFIX 
+            << "Unhandled interrupt: " 
+            << static_cast<unsigned>(vector) 
+            << '\n'
+        ;
+
         __asm__ __volatile__ (
-        ".intel_syntax noprefix\n"
-        "cli\n"
-        "hlt\n"
+            ".intel_syntax noprefix\n"
+            "cli\n"
+            "hlt\n"
         );
     }
-
 
     static void tramplin0x0() {
         kernelPanic(0x0);
@@ -1303,8 +1368,29 @@ public:
         tramplin0xFF
     };
 
-
     static void init() {
-        //TODO   
+        constexpr unsigned numHeapBlocksNeeded = 256 * sizeof(GateDescriptor) / Heap::blockSize();
+        static_assert(256 * sizeof(GateDescriptor) % Heap::blockSize() == 0, "");
+
+        _gateDescriptorsAddr = Heap::allocateBlocks(numHeapBlocksNeeded);
+
+        for (unsigned vector = 0; vector < 0xFF + 1; vector++) {
+            unsigned handler = __ptr_value(tramplins[vector]);
+            unsigned short low16bits = static_cast<unsigned short>(handler);
+            unsigned short high16bits = static_cast<unsigned short>(handler >> 16);
+            
+            GateDescriptor gateDescriptor = {
+                low16bits,
+                0,
+                0,
+                GateType::INTERRUPT_GATE,
+                0,
+                DplState::CORE,
+                1,
+                high16bits
+            };
+            
+            reinterpret_cast<GateDescriptor *>(_gateDescriptorsAddr)[vector] = gateDescriptor;
+        }
     }
 };

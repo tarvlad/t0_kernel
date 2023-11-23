@@ -6,7 +6,6 @@ nasm \
     -o init.bin
 
 clang++ \
-    -Ofast \
     -Wall \
     -fno-exceptions \
     -fno-rtti \

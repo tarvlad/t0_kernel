@@ -9,13 +9,16 @@ static_assert(sizeof(char) == 1, "");
 
 
 extern "C" int main(void) {
-    InterruptHandler::init();
-    
-    DisplayPrinter display;
     Heap::initHeap();
+    InterruptHandler::init();
+    __asm__ __volatile__ (
+        ".intel_syntax noprefix\n"
+        "sti\n"
+    ); // interrupts now are enabled
 
-    InterruptHandler::tramplin0x12();
+    DisplayPrinter display;
     
+
     // volatile because barrier
     __asm__ __volatile__ (
         ".intel_syntax noprefix\n"
