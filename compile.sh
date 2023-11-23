@@ -5,17 +5,12 @@ nasm \
     init.s \
     -o init.bin
 
-clang++ \
+gcc \
     -Wall \
-    -fno-exceptions \
-    -fno-rtti \
-    -std=c++20 \
-    -nostdlib \
     -m32 \
     -ffreestanding \
-    -c \
-        -o kernel.o \
-    kernel.cpp
+    -c -o kernel.o \
+    kernel.c
 
 ld \
     --ignore-unresolved-symbol _GLOBAL_OFFSET_TABLE_ \
@@ -23,7 +18,8 @@ ld \
     -o kernel.tmp \
     -Ttext 0x20200 \
     --entry main \
-    kernel.o
+    kernel.o \
+    idt_load.o
 
 size kernel.tmp
 
