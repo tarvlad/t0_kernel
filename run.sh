@@ -1,6 +1,7 @@
 #!/bin/bash
 
-./compile.sh
+make all
+make clean
 
 qemu-system-i386 \
     -fda boot.img \
