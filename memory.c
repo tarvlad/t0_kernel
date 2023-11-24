@@ -10,7 +10,7 @@ void memcpy(u4 dst, u4 src, u4 size) {
 }
 
 
-static struct idt_entity idt[256];
+//static struct idt_entity idt[256];
 
 
 static void tramplin_0() {
@@ -1298,14 +1298,10 @@ void init_idt() {
         tramplin_FF,
     };
 
+    struct idt_entity *idt = __to_ptr_cast(struct idt_entity, allocate_blocks(4));
+
     for (u4 i = 0; i < 256; i++) {
         u4 handler_addr = __ptr_value(tramplins[i]);
-        struct segment_selector segment = {
-            0,
-            0,
-            8
-        };
-
         struct idt_entity idt_entity = {
             (u2)handler_addr,
             8,
@@ -1322,4 +1318,49 @@ void init_idt() {
     idt_descriptor.idt_size = 255;
 
     __idt_load(__ptr_value(&idt_descriptor));
+}
+
+
+void init_heap() {
+    for (u4 i = 0; i < NUM_HEAP_SECTORS; i++) {
+        HEAP_BLOCK_HEADERS[i] = HEAP_SECTOR_FREE;
+    }
+}
+
+
+u4 allocate_blocks(u4 num_blocks) {
+    u4 num_free_blocks = 0;
+    u4 first_free_block_idx = 0;
+
+    for (u4 i = 0; i < NUM_HEAP_SECTORS; i++) {
+        if (HEAP_BLOCK_HEADERS[i] == HEAP_SECTOR_FREE) {
+            if (num_free_blocks == 0) {
+                first_free_block_idx = i;
+            }
+            num_free_blocks++;
+        } else {
+            num_free_blocks = 0;
+            i += HEAP_BLOCK_HEADERS[i] - 1;
+        }
+
+        if (num_free_blocks == num_blocks) {
+            HEAP_BLOCK_HEADERS[i] = num_blocks;
+            return HEAP_DATA_BEG_ADDR + first_free_block_idx * HEAP_BLOCK_SIZE;
+        }
+    }
+
+    print("KERNEL ALLOCATION ERROR: NOT ENOUGH SPACE FOR ALLOCATE ");
+    print_u4_hex(num_blocks);
+    print(" BLOCKS");
+    __asm__ __volatile__ (
+        "cli\n"
+        "hlt\n"
+    );
+    return 0;
+}
+
+
+void deallocate_blocks(u4 region_addr) {
+    u4 block_idx = (region_addr - HEAP_DATA_BEG_ADDR) / HEAP_BLOCK_SIZE;
+    HEAP_BLOCK_HEADERS[block_idx] = HEAP_SECTOR_FREE;
 }

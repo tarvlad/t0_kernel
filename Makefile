@@ -1,12 +1,12 @@
 CC=gcc
 ASM=nasm
-CFLAGS=-std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+CFLAGS=-Os -std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 BOOTSECTORFLAGS=-fbin
 ASMELFFLAGS=-felf
 LD=ld
 LDARGS=-m elf_i386 -o kernel.tmp -Ttext 0x20200 --entry main
 
-LD_SRC=kernel.o display.o memory.o idt_setup.o read_gdt.o read_idt.o
+LD_SRC=kernel.o display.o memory.o idt_setup.o read_gdt.o read_idt.o pic.o
 ASM_BOOTSECTOR_SRC=init.asm
 
 all:
@@ -17,6 +17,7 @@ all:
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.o 
 	$(CC) $(CFLAGS) -c display.c -o display.o
 	$(CC) $(CFLAGS) -c memory.c -o memory.o
+	$(CC) $(CFLAGS) -c pic.c -o pic.o
 	$(LD) $(LDARGS) $(LD_SRC)
 	size kernel.tmp
 	objcopy -I elf32-i386 -O binary kernel.tmp kernel.bin

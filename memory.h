@@ -14,9 +14,9 @@
 __asm__ __volatile__ ("cli"); \
 print("Unhandled interrupt "); \
 print_u4_hex(vector); \
-for (;;) { \
-    (void)42; \
-}
+__asm__ __volatile__( \
+    "hlt\n" \
+); \
 
 
 void memcpy(u4 dst, u4 src, u4 size);
@@ -75,9 +75,8 @@ struct idt_descriptor {
 #pragma pack(pop)
 
 
-
 #define HEAP_BEG 0x100000
-#define HEAP_END 0x100000
+#define HEAP_END 0x400000
 #define HEAP_SIZE (HEAP_END - HEAP_BEG)
 
 #define HEAP_BLOCK_SIZE 512
@@ -85,3 +84,12 @@ struct idt_descriptor {
 #define NUM_HEAP_SECTORS (HEAP_SIZE / (HEAP_BLOCK_SIZE + 4))
 
 #define HEAP_DATA_BEG_ADDR (HEAP_BEG + 4 * NUM_HEAP_SECTORS)
+
+#define HEAP_BLOCK_HEADERS __to_ptr_cast(u4, HEAP_BEG)
+
+
+void init_heap();
+
+u4 allocate_blocks(u4 num_blocks);
+
+void deallocate_blocks(unsigned region_addr);
