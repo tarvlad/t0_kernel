@@ -1349,9 +1349,7 @@ u4 allocate_blocks(u4 num_blocks) {
         }
     }
 
-    print("KERNEL ALLOCATION ERROR: NOT ENOUGH SPACE FOR ALLOCATE ");
-    print_u4_hex(num_blocks);
-    print(" BLOCKS");
+    printfmt("kernel allocation error: not enough heap space for allocate %u blocks", num_blocks);
     __asm__ __volatile__ (
         "cli\n"
         "hlt\n"

@@ -128,6 +128,48 @@ static void print_char(char symbol) {
     }
 }
 
+// currently supports
+// %u, %x, %s
+__attribute__((cdecl))
+void printfmt(char *str, ...) {
+    char symbol;
+    u4 stack_arg = __ptr_value(str) + 4;
+    do {
+        symbol = *str++;
+        if (symbol == 0) {
+            break;
+        }
+
+        if (symbol == '%') {
+            symbol = *str++;
+            switch (symbol) {
+            case 'x': {
+                u4 value = *__to_ptr_cast(u4, stack_arg);
+                stack_arg += 4;
+                print_u4_hex(value);
+                break;
+            }
+            case 'u': {
+                u4 value = *__to_ptr_cast(u4, stack_arg);
+                stack_arg += 4;
+                print_u4(value);
+                break;
+            }
+            case 's': {
+                char *value = __to_ptr_cast(char, stack_arg);
+                stack_arg += 4;
+                print(value);
+                break;
+            }
+            default: {
+                print_char('%');
+                print_char(symbol);
+            }
+            }
+        }
+    } while (1);
+}
+
 
 void print(char *str) {
     char symbol;
