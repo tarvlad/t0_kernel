@@ -1,4 +1,4 @@
-CC=clang
+CC=gcc
 ASM=nasm
 CFLAGS=-Os -std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 BOOTSECTORFLAGS=-fbin
@@ -6,14 +6,13 @@ ASMELFFLAGS=-felf
 LD=ld
 LDARGS=-m elf_i386 -o kernel.tmp -Ttext 0x20200 --entry main
 
-LD_SRC=kernel.o display.o memory.o idt_setup.o read_gdt.o read_idt.o pic.o
+LD_SRC=kernel.o display.o memory.o idt_setup.o pic.o io_ports.o
 ASM_BOOTSECTOR_SRC=init.asm
 
 all:
 	$(ASM) $(BOOTSECTORFLAGS) $(ASM_BOOTSECTOR_SRC) -o init.bin
 	$(ASM) $(ASMELFFLAGS) idt_setup.asm -o idt_setup.o
-	$(ASM) $(ASMELFFLAGS) read_gdt.asm -o read_gdt.o
-	$(ASM) $(ASMELFFLAGS) read_idt.asm -o read_idt.o
+	$(ASM) $(ASMELFFLAGS) io_ports.asm -o io_ports.o
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.o 
 	$(CC) $(CFLAGS) -c display.c -o display.o
 	$(CC) $(CFLAGS) -c memory.c -o memory.o

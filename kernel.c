@@ -1,13 +1,17 @@
 #include "display.h"
 #include "memory.h"
+#include "pic.h"
 
 
 int main(void) {
     init_printer();
     init_heap();
     init_idt();
+    //init_pic();
 
-    printfmt("test message: [%u]\n", 4012);
+    const char *msg = "_ test _";
+
+    printfmt("test message: [%s]\n", msg);
 
     __asm__ __volatile__("sti");
     
