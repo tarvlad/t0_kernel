@@ -11,7 +11,7 @@
 #define DISPLAY_NUM_SYMBOLS (DISPLAY_ROWS * DISPLAY_COLUMNS)
 
 
-enum VGA_COLOR : u1 {
+enum VGA_COLOR {
     BLACK,
     BLUE,
     GREEN,
@@ -132,8 +132,9 @@ static void print_char(char symbol) {
 // %u, %x, %s
 __attribute__((cdecl))
 void printfmt(char *str, ...) {
+    u4 *va_list = __to_ptr_cast(u4, &str);
     char symbol;
-    u4 stack_arg = __ptr_value(str) + 4;
+    u4 curr_arg = 1;
     do {
         symbol = *str++;
         if (symbol == 0) {
@@ -144,21 +145,18 @@ void printfmt(char *str, ...) {
             symbol = *str++;
             switch (symbol) {
             case 'x': {
-                u4 value = *__to_ptr_cast(u4, stack_arg);
-                stack_arg += 4;
+                u4 value = va_list[curr_arg++];
                 print_u4_hex(value);
                 break;
             }
             case 'u': {
-                u4 value = *__to_ptr_cast(u4, stack_arg);
-                stack_arg += 4;
+                u4 value = va_list[curr_arg++];
                 print_u4(value);
                 break;
             }
             case 's': {
-                char *value = __to_ptr_cast(char, stack_arg);
-                stack_arg += 4;
-                print(value);
+                u4 value = va_list[curr_arg++];
+                print(__to_ptr_cast(char, value));
                 break;
             }
             default: {
@@ -166,6 +164,8 @@ void printfmt(char *str, ...) {
                 print_char(symbol);
             }
             }
+        } else {
+            print_char(symbol);
         }
     } while (1);
 }

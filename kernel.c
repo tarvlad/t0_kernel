@@ -7,7 +7,7 @@ int main(void) {
     init_heap();
     init_idt();
 
-    printfmt("test %x %u", 42, 11123);
+    printfmt("test message: [%u]\n", 4012);
 
     __asm__ __volatile__("sti");
     

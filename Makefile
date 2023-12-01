@@ -1,4 +1,4 @@
-CC=gcc
+CC=clang
 ASM=nasm
 CFLAGS=-Os -std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 BOOTSECTORFLAGS=-fbin
