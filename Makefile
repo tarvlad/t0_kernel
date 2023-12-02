@@ -1,6 +1,6 @@
 CC=gcc
 ASM=nasm
-CFLAGS=-Os -std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+CFLAGS=-Os -march=i486 -std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 BOOTSECTORFLAGS=-fbin
 ASMELFFLAGS=-felf
 LD=ld
@@ -32,5 +32,5 @@ clean:
 	rm display.o
 	rm idt_setup.o
 	rm memory.o
-	rm read_gdt.o
-	rm read_idt.o
+	rm io_ports.o
+	rm pic.o

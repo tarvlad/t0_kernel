@@ -1315,7 +1315,7 @@ void init_idt() {
 
     static struct idt_descriptor idt_descriptor;
     idt_descriptor.idt_addr = __ptr_value(idt);
-    idt_descriptor.idt_size = 255;
+    idt_descriptor.idt_size = 0xFFFF;
 
     __idt_load(__ptr_value(&idt_descriptor));
 }

@@ -1,38 +1,44 @@
 #include "pic.h"
 
-#define PIC1_PORT 0x20
-#define PIC2_PORT 0xA0
-#define BIOS_DIAGNOSTIC_PORT 0x80
 
-#define ICW1 0x11 
-#define ICW2_MASTER 0x20
-#define ICW2_SLAVE 0x28
-#define ICW3_MASTER 0x4
-#define ICW3_SLAVE 0x2
-#define ICW4 0x1
+void send_command_8259_master(u2 command) {
+    __outb(0x20, command);
+}
+
+
+void send_command_8259_slave(u2 command) {
+    __outb(0xA0, command);
+}
+
+
+void send_data_8259_master(u2 data) {
+    __outb(0x21, data);
+}
+
+
+void send_data_8259_slave(u2 data) {
+    __outb(0xA1, data);
+}
+
 
 void init_pic() {
-    __outb(PIC1_PORT, ICW1);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
+    send_command_8259_master(0x11);
 
-    __outb(PIC2_PORT, ICW1);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
+    send_command_8259_slave(0x11);
 
-    __outb(PIC1_PORT, ICW2_MASTER);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
-
-    __outb(PIC2_PORT, ICW2_SLAVE);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
-
-    __outb(PIC1_PORT, ICW3_MASTER);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
-
-    __outb(PIC2_PORT, ICW3_SLAVE);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
-
-    __outb(PIC1_PORT, ICW4);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
+    send_data_8259_master(0x20);
     
-    __outb(PIC2_PORT, ICW4);
-    __outb(BIOS_DIAGNOSTIC_PORT, 0);
+    send_data_8259_slave(0x28);
+
+    send_data_8259_master(0x4);
+    
+    send_data_8259_slave(0x2);
+
+    send_data_8259_master(0x1);
+
+    send_data_8259_slave(0x1);
+
+    send_data_8259_master(0xF9);
+
+    send_data_8259_slave(0xFF);
 }
