@@ -130,7 +130,6 @@ static void print_char(char symbol) {
 
 // currently supports
 // %u, %x, %s
-__attribute__((cdecl))
 void printfmt(char *str, ...) {
     u4 *va_list = __to_ptr_cast(u4, &str);
     char symbol;

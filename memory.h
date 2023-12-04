@@ -22,8 +22,7 @@ void memcpy(u4 dst, u4 src, u4 size);
 
 void init_idt();
 
-__attribute__((cdecl))
-void __idt_load(unsigned idt_descriptor);
+void __idt_load(unsigned idt_descriptor) __EXTERN_DEF;
 
 #pragma pack(push, 1)
 struct segment_selector {
@@ -87,4 +86,4 @@ void init_heap();
 
 u4 allocate_blocks(u4 num_blocks);
 
-void deallocate_blocks(unsigned region_addr);
+void deallocate_blocks(u4 region_addr);

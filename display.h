@@ -16,5 +16,4 @@ void print_u4(u4 value);
 
 void print_u4_hex(u4 value);
 
-__attribute__((cdecl))
 void printfmt(char *str, ...);
