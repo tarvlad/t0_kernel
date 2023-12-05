@@ -4,10 +4,10 @@
 void init_pic();
 
 
-void __outb(u2 port, u1 data) __EXTERN_DEF;
+void __outb(u2 port, u1 data);
 
 
-u1 __inb(u2 port) __EXTERN_DEF;
+u1 __inb(u2 port);
 
 
 void send_command_8259_master(u2 command);

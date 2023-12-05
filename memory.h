@@ -11,7 +11,7 @@
 
 
 #define __UNHANDLED_INTERRUPT(vector) \
-__asm__ __volatile__ ("cli"); \
+__asm__ __volatile__("cli"); \
 printfmt("unhandled interrupt %x", vector); \
 __asm__ __volatile__( \
     "hlt\n" \
@@ -22,7 +22,7 @@ void memcpy(u4 dst, u4 src, u4 size);
 
 void init_idt();
 
-void __idt_load(unsigned idt_descriptor) __EXTERN_DEF;
+void __idt_load(unsigned idt_descriptor);
 
 #pragma pack(push, 1)
 struct segment_selector {
