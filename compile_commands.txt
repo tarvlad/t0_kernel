@@ -1,4 +1,0 @@
--std=c17
--m32
--Wall
--Wno-incompatible-library-redeclaration
