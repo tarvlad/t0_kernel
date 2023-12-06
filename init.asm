@@ -6,7 +6,7 @@
 ; kernel data located from 0x20000 up to 0x80000, 384 KiB
 ; boot sector code loaded to 0x7C00 up to 0x7D00, 512 bytes
 
-[ BITS 16 ]
+[BITS 16]
 
 ; 8 KiB stack setup
 cli
