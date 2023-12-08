@@ -48,3 +48,5 @@ clean:
 	rm memory.o
 	rm io_ports.o
 	rm pic.o
+	rm interrupt_handle.o
+	rm tramplins.o
