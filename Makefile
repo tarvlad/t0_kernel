@@ -18,17 +18,19 @@ BOOTSECTORFLAGS=-fbin
 ASMELFFLAGS=-felf
 LDARGS=-m elf_i386 -o kernel.tmp -Ttext 0x20200 --entry main
 
-LD_SRC=kernel.o display.o memory.o idt_setup.o pic.o io_ports.o
+LD_SRC=kernel.o display.o memory.o idt_setup.o pic.o io_ports.o interrupt_handle.o tramplins.o
 ASM_BOOTSECTOR_SRC=init.asm
 
 all:
-	$(ASM) $(BOOTSECTORFLAGS) $(ASM_BOOTSECTOR_SRC) -o init.bin
-	$(ASM) $(ASMELFFLAGS) idt_setup.asm -o idt_setup.o
-	$(ASM) $(ASMELFFLAGS) io_ports.asm -o io_ports.o
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.o 
 	$(CC) $(CFLAGS) -c display.c -o display.o
 	$(CC) $(CFLAGS) -c memory.c -o memory.o
 	$(CC) $(CFLAGS) -c pic.c -o pic.o
+	$(CC) $(CFLAGS) -c interrupt_handle.c -o interrupt_handle.o
+	$(ASM) $(BOOTSECTORFLAGS) $(ASM_BOOTSECTOR_SRC) -o init.bin
+	$(ASM) $(ASMELFFLAGS) idt_setup.asm -o idt_setup.o
+	$(ASM) $(ASMELFFLAGS) io_ports.asm -o io_ports.o
+	$(ASM) $(ASMELFFLAGS) tramplins.asm -o tramplins.o
 	$(LD) $(LDARGS) $(LD_SRC)
 	$(SIZE) kernel.tmp
 	$(OBJCOPY) -I elf32-i386 -O binary kernel.tmp kernel.bin

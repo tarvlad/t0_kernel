@@ -14,6 +14,4 @@
 #ifdef _WIN32
 #define __asm__
 #define __volatile__(smth, ...)
-#else
-#define __EXTERN_DEF ;
 #endif
