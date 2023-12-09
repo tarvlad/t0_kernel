@@ -1,7 +1,10 @@
 #!/bin/bash
 
-./compile.sh
+make all
 
-qemu-system-i386 -fda boot.img -monitor stdio -device VGA
-#qemu-system-i386 boot.img -S -s -vnc none &
-
+qemu-system-i386 \
+    -cpu 486 \
+    -m 32m \
+    -fda build/boot.img \
+    -monitor stdio \
+    -device VGA
