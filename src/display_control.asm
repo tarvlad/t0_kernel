@@ -94,8 +94,77 @@ ret
 ; print formatted string fmt to screen
 ; currently support %s, %x
 printfmt:
-mov eax, [esp + 4]          ; get fmt addr
+push ebp
+mov ebp, esp
 
+mov eax, [ebp + 8]          ; fmt addr
+mov ecx, 12                 ; ebp offset for current va arg
+
+.loop:
+xor edx, edx
+mov dl, [eax]               ; get string symbol
+cmp dl, 0                   ; is end of string ?
+je .exit
+
+cmp dl, 0x25                ; is symbol % ?
+jne .write
+inc eax
+mov dl, [eax]               ; get next symbol
+cmp dl, 0x78                ; is symbol x ?
+jne .not_x
+push eax
+push ecx
+push edx
+push dword [ebp + ecx]      ; get va arg
+call print_hex
+pop edx
+pop edx
+pop ecx
+pop eax
+add ecx, 4                  ; next va arg
+jmp .write_end
+.not_x:
+cmp dl, 0x73                ; is symbol s ?
+jne .not_s
+push eax
+push ecx
+push edx
+push dword [ebp + ecx]      ; get va arg
+call printfmt
+pop edx
+pop edx
+pop ecx
+pop eax
+add ecx, 4                  ; next va arg
+jmp .write_end
+.not_s:
+push eax
+push ecx
+push edx
+push 0x25
+call print_char             ; print % and this symbol
+pop edx
+pop edx
+pop ecx
+pop eax
+.write:
+push eax
+push ecx
+push edx
+push edx
+call print_char
+pop edx
+pop edx
+pop ecx
+pop eax
+.write_end:
+inc eax
+jmp .loop
+
+.exit:
+hlt
+mov esp, ebp
+pop ebp
 ret
 
 
