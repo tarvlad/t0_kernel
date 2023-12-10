@@ -174,7 +174,6 @@ inc eax
 jmp .loop
 
 .exit:
-hlt
 mov esp, ebp
 pop ebp
 ret

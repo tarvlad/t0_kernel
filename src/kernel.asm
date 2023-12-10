@@ -14,8 +14,15 @@ push 0x42
 push 0x53
 push msg
 call printfmt
-
+add esp, 12
+push msg2
+push msg1
+call printfmt
 hlt
 
 msg:
 db `Hello\nand it's a new line %x %x`,0
+msg1:
+db `\n\ttest message: [%s]`,0
+msg2:
+db `test`,0
