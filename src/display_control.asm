@@ -1,3 +1,15 @@
+[bits 32]
+
+
+global vga_clear_screen
+global vga_print_char
+
+global reset_printer
+global print_hex
+global print_char
+global printfmt
+
+
 display_carriage:
 dd 0                        ; x
 dd 0                        ; y

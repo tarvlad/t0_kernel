@@ -136,4 +136,3 @@ jmp GDT_KMOD_CODE_SEG_OFFSET:0x20200
 
 times 510-($-$$) db 0
 dw 0xaa55                   ; boot sector signature
-%include "src/kernel.asm"
