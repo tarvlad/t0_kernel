@@ -7,7 +7,7 @@ ASM_KERNEL_FLAGS=-felf
 BUILD=build
 LD=ld
 LD_ARGS=-m elf_i386 -o $(BUILD)/kernel.tmp -Ttext 0x20200 --entry main
-LD_SRC=$(BUILD)/kernel.o $(BUILD)/display_control.o
+LD_SRC=$(BUILD)/kernel.o $(BUILD)/display_control.o $(BUILD)/allocator.o
 
 SIZE=size
 
@@ -19,6 +19,7 @@ all:
 	$(ASM) $(ASM_BOOTSECTOR_FLAGS) $(SRC)/init.asm -o $(BUILD)/init.bin
 	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/kernel.asm -o $(BUILD)/kernel.o
 	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/display_control.asm -o $(BUILD)/display_control.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/allocator.asm -o $(BUILD)/allocator.o
 	$(LD) $(LD_ARGS) $(LD_SRC)
 	$(SIZE) $(BUILD)/kernel.tmp
 	$(OBJCOPY) $(OBJCOPY_FLAGS) $(OBJCOPY_SRC)
