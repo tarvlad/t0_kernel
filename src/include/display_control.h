@@ -3,6 +3,7 @@
 
 #include "ktypes.h"
 
+
 void vga_clear_screen();
 void vga_print_char(char symbol, u4 x, u4 y);
 

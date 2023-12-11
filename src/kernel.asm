@@ -7,6 +7,7 @@
 extern reset_printer
 extern init_heap
 extern init_idt
+extern init_8259
 
 global main
 
@@ -15,5 +16,6 @@ main:
 call reset_printer
 call init_heap
 call init_idt
-
+call init_8259
+int 0x20
 hlt
