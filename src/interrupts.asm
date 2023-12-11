@@ -72,6 +72,7 @@ global init_idt
 extern allocate_blocks
 
 global interrupt_handler
+extern printfmt
 
 
 ; routine for interrupt handling, 
@@ -98,8 +99,17 @@ global interrupt_handler
 ; esi           [esp +  8] 
 ; edi           [esp +  4]
 interrupt_handler:
+mov ecx, esp
+cli
+push dword [ecx + 60]       ;  eip
+push dword [ecx + 52]       ;  vector
+push unhandled_interrupt_msg
+call printfmt
 hlt
-;TODO
+
+
+unhandled_interrupt_msg:
+db `Unhandled interrupt %x at %x, kernel aborted`, 0
 
 
 ; void init_idt();
