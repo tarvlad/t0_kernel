@@ -6,11 +6,14 @@
 
 extern reset_printer
 extern init_heap
+extern init_idt
+
 global main
 
 
 main:
 call reset_printer
 call init_heap
+call init_idt
 
 hlt

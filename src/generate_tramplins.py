@@ -1,12 +1,16 @@
 if __name__ == "__main__":
-    with open("/home/tarvlad/source/t0_kernel/src/tramplins.asm", "w") as out:
-        out.write("[bits 32]\n\n")
-        for i in range(256):
-            out.write("global tramplin_" + hex(i)[2:] + "\n")
-        out.write("\n")
-        for i in range(256):
-            out.write("tramplin_" + hex(i)[2:] + ":\n")
-            out.write("push " + hex(i) + "\n")
-            out.write("jmp collect_context\n\n")
-        out.write("\n")
-
+    ctr = 0
+    for i in range(256):
+        print("mov eax, tramplin_" + hex(i)[2:])
+        print("mov word [ecx + " + str(ctr) + "], ax")
+        ctr += 2
+        print("mov word [ecx + " + str(ctr) + "], 8")
+        ctr += 2
+        print("mov byte [ecx + " + str(ctr) + "], 0")
+        ctr += 1
+        print("mov byte [ecx + " + str(ctr) + "], 0x8e")
+        ctr += 1
+        print("shr eax, 16")
+        print("mov word [ecx + " + str(ctr) + "], ax")
+        ctr += 2
+        print()

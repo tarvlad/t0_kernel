@@ -45,15 +45,26 @@ mov cl, 1                   ; sector from 1
 mov dh, 0                   ; 0 head
 xor bx, bx                  ; to 0x2000:0 == 0x20000
 int 0x13
-add bx, 0x2400              ; to 0x2000:2400 == 0x22400
-inc dh                      ; 1 head
+mov ah, 2                   ; read from disk 
+mov al, 18                  ; read 18 sectors
+mov ch, 0                   ; 0 cylinder
+mov cl, 1                   ; sector from 1
+mov dh, 1                   ; 1 head
+mov bx, 0x2400              ; to 0x2000:2400 == 0x22400
 int 0x13
-add bx, 0x2400              ; to 0x2000:4800 == 0x24800
-dec dh                      ; 0 head
-inc ch                      ; 1 cylinder
+mov ah, 2                   ; read from disk
+mov al, 18                  ; read 18 sectors
+mov ch, 1                   ; 1 cylinder
+mov cl, 1                   ; sector from 1
+mov dh, 0                   ; 0 head
+mov bx, 0x4800              ; to 0x2000:4800 == 0x24800
 int 0x13
-add bx, 0x2400              ; to 0x2000:6c00 == 0x26c00
-inc dh                      ; 1 head
+mov ah, 2                   ; read from disk
+mov al, 18                  ; read 18 sectors
+mov ch, 1                   ; 1 cylinder
+mov cl, 1                   ; sector from 1
+mov dh, 1                   ; head 1
+mov bx, 0x6c00              ; to 0x2000:6c00 == 0x26c00
 int 0x13
 
 

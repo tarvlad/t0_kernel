@@ -1284,4 +1284,5 @@ jmp collect_context
 
 
 collect_context:
+hlt
 ;TODO
