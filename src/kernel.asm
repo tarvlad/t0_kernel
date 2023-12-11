@@ -17,6 +17,5 @@ call reset_printer
 call init_heap
 call init_idt
 call init_8259
-mov ebx, 0
-div ebx
+sti
 hlt

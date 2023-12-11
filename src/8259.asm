@@ -80,7 +80,7 @@ call send_data_8259_master
 call send_data_8259_slave
 pop eax
 
-push 0xff
+push 0xfe
 call send_data_8259_master
 pop eax
 
