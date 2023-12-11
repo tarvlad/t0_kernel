@@ -228,6 +228,7 @@ mov [display_carriage], eax ; x incremented
 jmp .exit                   ; if not need to increment y
 
 .inc_y:
+mov dword [display_carriage], 0
 mov eax, [display_carriage + 4] ; y
 inc eax
 cmp eax, 25

@@ -217,6 +217,7 @@ push 0x1f
 jmp collect_context
 
 tramplin_20:
+push 0
 push 0x20
 jmp collect_context
 
@@ -378,10 +379,9 @@ push ds
 push es
 push fs
 push gs
-mov edi, 42
-pusha
+pushad
 call interrupt_handler
-popa 
+popad
 pop gs
 pop fs
 pop es

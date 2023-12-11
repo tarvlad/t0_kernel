@@ -100,9 +100,15 @@ extern printfmt
 ; edi           [esp +  4]
 interrupt_handler:
 mov ecx, esp
+mov eax, [ecx + 52]         ; vector
+cmp eax, 0x20
+jne .not_timer_interrupt
+call timer_interrupt_handler
+ret
+.not_timer_interrupt:
 cli
-push dword [ecx + 60]       ;  eip
-push dword [ecx + 52]       ;  vector
+push dword [ecx + 60]       ; eip
+push dword [ecx + 52]       ; vector
 push unhandled_interrupt_msg
 call printfmt
 hlt
@@ -110,6 +116,9 @@ hlt
 
 unhandled_interrupt_msg:
 db `Unhandled interrupt %x at %x, kernel aborted`, 0
+
+
+extern timer_interrupt_handler
 
 
 ; void init_idt();
@@ -124,7 +133,7 @@ mov eax, tramplin_0         ; get addr
 mov word [ecx + 0], ax      ; low addr bits
 mov word [ecx + 2], 8       ; offset in gdt
 mov byte [ecx + 4], 0       ; gap
-mov byte [ecx + 5], 0x8e    ; interrupt gate
+mov byte [ecx + 5], 0x8f    ; trap gate
 shr eax, 16                 ; get high addr bits
 mov word [ecx + 6], ax      ; high addr bits
 
@@ -132,7 +141,7 @@ mov eax, tramplin_1
 mov word [ecx + 8], ax
 mov word [ecx + 10], 8
 mov byte [ecx + 12], 0
-mov byte [ecx + 13], 0x8e
+mov byte [ecx + 13], 0x8f
 shr eax, 16
 mov word [ecx + 14], ax
 
@@ -140,7 +149,7 @@ mov eax, tramplin_2
 mov word [ecx + 16], ax
 mov word [ecx + 18], 8
 mov byte [ecx + 20], 0
-mov byte [ecx + 21], 0x8e
+mov byte [ecx + 21], 0x8f
 shr eax, 16
 mov word [ecx + 22], ax
 
@@ -148,7 +157,7 @@ mov eax, tramplin_3
 mov word [ecx + 24], ax
 mov word [ecx + 26], 8
 mov byte [ecx + 28], 0
-mov byte [ecx + 29], 0x8e
+mov byte [ecx + 29], 0x8f
 shr eax, 16
 mov word [ecx + 30], ax
 
@@ -156,7 +165,7 @@ mov eax, tramplin_4
 mov word [ecx + 32], ax
 mov word [ecx + 34], 8
 mov byte [ecx + 36], 0
-mov byte [ecx + 37], 0x8e
+mov byte [ecx + 37], 0x8f
 shr eax, 16
 mov word [ecx + 38], ax
 
@@ -164,7 +173,7 @@ mov eax, tramplin_5
 mov word [ecx + 40], ax
 mov word [ecx + 42], 8
 mov byte [ecx + 44], 0
-mov byte [ecx + 45], 0x8e
+mov byte [ecx + 45], 0x8f
 shr eax, 16
 mov word [ecx + 46], ax
 
@@ -172,7 +181,7 @@ mov eax, tramplin_6
 mov word [ecx + 48], ax
 mov word [ecx + 50], 8
 mov byte [ecx + 52], 0
-mov byte [ecx + 53], 0x8e
+mov byte [ecx + 53], 0x8f
 shr eax, 16
 mov word [ecx + 54], ax
 
@@ -180,7 +189,7 @@ mov eax, tramplin_7
 mov word [ecx + 56], ax
 mov word [ecx + 58], 8
 mov byte [ecx + 60], 0
-mov byte [ecx + 61], 0x8e
+mov byte [ecx + 61], 0x8f
 shr eax, 16
 mov word [ecx + 62], ax
 
@@ -188,7 +197,7 @@ mov eax, tramplin_8
 mov word [ecx + 64], ax
 mov word [ecx + 66], 8
 mov byte [ecx + 68], 0
-mov byte [ecx + 69], 0x8e
+mov byte [ecx + 69], 0x8f
 shr eax, 16
 mov word [ecx + 70], ax
 
@@ -196,7 +205,7 @@ mov eax, tramplin_9
 mov word [ecx + 72], ax
 mov word [ecx + 74], 8
 mov byte [ecx + 76], 0
-mov byte [ecx + 77], 0x8e
+mov byte [ecx + 77], 0x8f
 shr eax, 16
 mov word [ecx + 78], ax
 
@@ -204,7 +213,7 @@ mov eax, tramplin_a
 mov word [ecx + 80], ax
 mov word [ecx + 82], 8
 mov byte [ecx + 84], 0
-mov byte [ecx + 85], 0x8e
+mov byte [ecx + 85], 0x8f
 shr eax, 16
 mov word [ecx + 86], ax
 
@@ -212,7 +221,7 @@ mov eax, tramplin_b
 mov word [ecx + 88], ax
 mov word [ecx + 90], 8
 mov byte [ecx + 92], 0
-mov byte [ecx + 93], 0x8e
+mov byte [ecx + 93], 0x8f
 shr eax, 16
 mov word [ecx + 94], ax
 
@@ -220,7 +229,7 @@ mov eax, tramplin_c
 mov word [ecx + 96], ax
 mov word [ecx + 98], 8
 mov byte [ecx + 100], 0
-mov byte [ecx + 101], 0x8e
+mov byte [ecx + 101], 0x8f
 shr eax, 16
 mov word [ecx + 102], ax
 
@@ -228,7 +237,7 @@ mov eax, tramplin_d
 mov word [ecx + 104], ax
 mov word [ecx + 106], 8
 mov byte [ecx + 108], 0
-mov byte [ecx + 109], 0x8e
+mov byte [ecx + 109], 0x8f
 shr eax, 16
 mov word [ecx + 110], ax
 
@@ -236,7 +245,7 @@ mov eax, tramplin_e
 mov word [ecx + 112], ax
 mov word [ecx + 114], 8
 mov byte [ecx + 116], 0
-mov byte [ecx + 117], 0x8e
+mov byte [ecx + 117], 0x8f
 shr eax, 16
 mov word [ecx + 118], ax
 
@@ -244,7 +253,7 @@ mov eax, tramplin_f
 mov word [ecx + 120], ax
 mov word [ecx + 122], 8
 mov byte [ecx + 124], 0
-mov byte [ecx + 125], 0x8e
+mov byte [ecx + 125], 0x8f
 shr eax, 16
 mov word [ecx + 126], ax
 
@@ -252,7 +261,7 @@ mov eax, tramplin_10
 mov word [ecx + 128], ax
 mov word [ecx + 130], 8
 mov byte [ecx + 132], 0
-mov byte [ecx + 133], 0x8e
+mov byte [ecx + 133], 0x8f
 shr eax, 16
 mov word [ecx + 134], ax
 
@@ -260,7 +269,7 @@ mov eax, tramplin_11
 mov word [ecx + 136], ax
 mov word [ecx + 138], 8
 mov byte [ecx + 140], 0
-mov byte [ecx + 141], 0x8e
+mov byte [ecx + 141], 0x8f
 shr eax, 16
 mov word [ecx + 142], ax
 
@@ -268,7 +277,7 @@ mov eax, tramplin_12
 mov word [ecx + 144], ax
 mov word [ecx + 146], 8
 mov byte [ecx + 148], 0
-mov byte [ecx + 149], 0x8e
+mov byte [ecx + 149], 0x8f
 shr eax, 16
 mov word [ecx + 150], ax
 
@@ -276,7 +285,7 @@ mov eax, tramplin_13
 mov word [ecx + 152], ax
 mov word [ecx + 154], 8
 mov byte [ecx + 156], 0
-mov byte [ecx + 157], 0x8e
+mov byte [ecx + 157], 0x8f
 shr eax, 16
 mov word [ecx + 158], ax
 
@@ -284,7 +293,7 @@ mov eax, tramplin_14
 mov word [ecx + 160], ax
 mov word [ecx + 162], 8
 mov byte [ecx + 164], 0
-mov byte [ecx + 165], 0x8e
+mov byte [ecx + 165], 0x8f
 shr eax, 16
 mov word [ecx + 166], ax
 
@@ -292,7 +301,7 @@ mov eax, tramplin_15
 mov word [ecx + 168], ax
 mov word [ecx + 170], 8
 mov byte [ecx + 172], 0
-mov byte [ecx + 173], 0x8e
+mov byte [ecx + 173], 0x8f
 shr eax, 16
 mov word [ecx + 174], ax
 
@@ -300,7 +309,7 @@ mov eax, tramplin_16
 mov word [ecx + 176], ax
 mov word [ecx + 178], 8
 mov byte [ecx + 180], 0
-mov byte [ecx + 181], 0x8e
+mov byte [ecx + 181], 0x8f
 shr eax, 16
 mov word [ecx + 182], ax
 
@@ -308,7 +317,7 @@ mov eax, tramplin_17
 mov word [ecx + 184], ax
 mov word [ecx + 186], 8
 mov byte [ecx + 188], 0
-mov byte [ecx + 189], 0x8e
+mov byte [ecx + 189], 0x8f
 shr eax, 16
 mov word [ecx + 190], ax
 
@@ -316,7 +325,7 @@ mov eax, tramplin_18
 mov word [ecx + 192], ax
 mov word [ecx + 194], 8
 mov byte [ecx + 196], 0
-mov byte [ecx + 197], 0x8e
+mov byte [ecx + 197], 0x8f
 shr eax, 16
 mov word [ecx + 198], ax
 
@@ -324,7 +333,7 @@ mov eax, tramplin_19
 mov word [ecx + 200], ax
 mov word [ecx + 202], 8
 mov byte [ecx + 204], 0
-mov byte [ecx + 205], 0x8e
+mov byte [ecx + 205], 0x8f
 shr eax, 16
 mov word [ecx + 206], ax
 
@@ -332,7 +341,7 @@ mov eax, tramplin_1a
 mov word [ecx + 208], ax
 mov word [ecx + 210], 8
 mov byte [ecx + 212], 0
-mov byte [ecx + 213], 0x8e
+mov byte [ecx + 213], 0x8f
 shr eax, 16
 mov word [ecx + 214], ax
 
@@ -340,7 +349,7 @@ mov eax, tramplin_1b
 mov word [ecx + 216], ax
 mov word [ecx + 218], 8
 mov byte [ecx + 220], 0
-mov byte [ecx + 221], 0x8e
+mov byte [ecx + 221], 0x8f
 shr eax, 16
 mov word [ecx + 222], ax
 
@@ -348,7 +357,7 @@ mov eax, tramplin_1c
 mov word [ecx + 224], ax
 mov word [ecx + 226], 8
 mov byte [ecx + 228], 0
-mov byte [ecx + 229], 0x8e
+mov byte [ecx + 229], 0x8f
 shr eax, 16
 mov word [ecx + 230], ax
 
@@ -356,7 +365,7 @@ mov eax, tramplin_1d
 mov word [ecx + 232], ax
 mov word [ecx + 234], 8
 mov byte [ecx + 236], 0
-mov byte [ecx + 237], 0x8e
+mov byte [ecx + 237], 0x8f
 shr eax, 16
 mov word [ecx + 238], ax
 
@@ -364,7 +373,7 @@ mov eax, tramplin_1e
 mov word [ecx + 240], ax
 mov word [ecx + 242], 8
 mov byte [ecx + 244], 0
-mov byte [ecx + 245], 0x8e
+mov byte [ecx + 245], 0x8f
 shr eax, 16
 mov word [ecx + 246], ax
 
@@ -372,7 +381,7 @@ mov eax, tramplin_1f
 mov word [ecx + 248], ax
 mov word [ecx + 250], 8
 mov byte [ecx + 252], 0
-mov byte [ecx + 253], 0x8e
+mov byte [ecx + 253], 0x8f
 shr eax, 16
 mov word [ecx + 254], ax
 

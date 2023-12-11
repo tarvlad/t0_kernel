@@ -18,4 +18,9 @@ call init_heap
 call init_idt
 call init_8259
 sti
+
+.back:
 hlt
+jmp .back
+jmp .back
+jmp .back
