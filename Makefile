@@ -7,7 +7,7 @@ ASM_KERNEL_FLAGS=-felf
 BUILD=build
 LD=ld
 LD_ARGS=-m elf_i386 -o $(BUILD)/kernel.tmp -Ttext 0x20200 --entry main
-LD_SRC=$(BUILD)/kernel.o $(BUILD)/display_control.o $(BUILD)/allocator.o $(BUILD)/io.o $(BUILD)/tramplins.o $(BUILD)/interrupts.o $(BUILD)/8259.o $(BUILD)/interrupts_handlers.o
+LD_SRC=$(BUILD)/kernel.o $(BUILD)/display_control.o $(BUILD)/allocator.o $(BUILD)/io.o $(BUILD)/tramplins.o $(BUILD)/interrupts.o $(BUILD)/8259.o $(BUILD)/interrupts_handlers.o $(BUILD)/virtual_memory.o
 
 SIZE=size
 
@@ -25,6 +25,7 @@ all:
 	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/interrupts.asm -o $(BUILD)/interrupts.o
 	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/8259.asm -o $(BUILD)/8259.o
 	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/interrupts_handlers.asm -o $(BUILD)/interrupts_handlers.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/virtual_memory.asm -o $(BUILD)/virtual_memory.o
 	$(LD) $(LD_ARGS) $(LD_SRC)
 	$(SIZE) $(BUILD)/kernel.tmp
 	$(OBJCOPY) $(OBJCOPY_FLAGS) $(OBJCOPY_SRC)
