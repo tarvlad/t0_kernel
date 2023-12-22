@@ -1,48 +1,38 @@
-UNAME_P=$(shell uname -p)
-
-ifeq ($(UNAME_P),arm)
-	CC=x86_64-elf-gcc
-	LD=x86_64-elf-ld
-	SIZE=x86_64-elf-size
-	OBJCOPY=x86_64-elf-objcopy
-else
-	CC=gcc
-	LD=ld
-	SIZE=size
-	OBJCOPY=objcopy
-endif
+SRC=src
 
 ASM=nasm
-CFLAGS=-Os -march=i486 -std=c17 -Wall -m32 -ffreestanding -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
-BOOTSECTORFLAGS=-fbin
-ASMELFFLAGS=-felf
-LDARGS=-m elf_i386 -o kernel.tmp -Ttext 0x20200 --entry main
+ASM_BOOTSECTOR_FLAGS=-fbin
+ASM_KERNEL_FLAGS=-felf
 
-LD_SRC=kernel.o display.o memory.o idt_setup.o pic.o io_ports.o
-ASM_BOOTSECTOR_SRC=init.asm
+BUILD=build
+LD=ld
+LD_ARGS=-m elf_i386 -o $(BUILD)/kernel.tmp -Ttext 0x20200 --entry main
+LD_SRC=$(BUILD)/kernel.o $(BUILD)/display_control.o $(BUILD)/allocator.o $(BUILD)/io.o $(BUILD)/tramplins.o $(BUILD)/interrupts.o $(BUILD)/8259.o $(BUILD)/interrupts_handlers.o $(BUILD)/virtual_memory.o
+
+SIZE=size
+
+OBJCOPY=objcopy
+OBJCOPY_FLAGS=-I elf32-i386 -O binary
+OBJCOPY_SRC=$(BUILD)/kernel.tmp $(BUILD)/kernel.bin
 
 all:
-	$(ASM) $(BOOTSECTORFLAGS) $(ASM_BOOTSECTOR_SRC) -o init.bin
-	$(ASM) $(ASMELFFLAGS) idt_setup.asm -o idt_setup.o
-	$(ASM) $(ASMELFFLAGS) io_ports.asm -o io_ports.o
-	$(CC) $(CFLAGS) -c kernel.c -o kernel.o 
-	$(CC) $(CFLAGS) -c display.c -o display.o
-	$(CC) $(CFLAGS) -c memory.c -o memory.o
-	$(CC) $(CFLAGS) -c pic.c -o pic.o
-	$(LD) $(LDARGS) $(LD_SRC)
-	$(SIZE) kernel.tmp
-	$(OBJCOPY) -I elf32-i386 -O binary kernel.tmp kernel.bin
-	dd if=/dev/zero of=boot.img bs=1024 count=1440
-	dd if=init.bin of=boot.img conv=notrunc	
-	dd if=kernel.bin of=boot.img conv=notrunc seek=1
+	$(ASM) $(ASM_BOOTSECTOR_FLAGS) $(SRC)/init.asm -o $(BUILD)/init.bin
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/kernel.asm -o $(BUILD)/kernel.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/display_control.asm -o $(BUILD)/display_control.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/allocator.asm -o $(BUILD)/allocator.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/io.asm -o $(BUILD)/io.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/tramplins.asm -o $(BUILD)/tramplins.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/interrupts.asm -o $(BUILD)/interrupts.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/8259.asm -o $(BUILD)/8259.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/interrupts_handlers.asm -o $(BUILD)/interrupts_handlers.o
+	$(ASM) $(ASM_KERNEL_FLAGS) $(SRC)/virtual_memory.asm -o $(BUILD)/virtual_memory.o
+	$(LD) $(LD_ARGS) $(LD_SRC)
+	$(SIZE) $(BUILD)/kernel.tmp
+	$(OBJCOPY) $(OBJCOPY_FLAGS) $(OBJCOPY_SRC)
+	dd if=/dev/zero of=$(BUILD)/boot.img bs=1024 count=1440
+	dd if=$(BUILD)/init.bin of=$(BUILD)/boot.img conv=notrunc
+	dd if=$(BUILD)/kernel.bin of=$(BUILD)/boot.img conv=notrunc seek=1
+
 
 clean:
-	rm kernel.o
-	rm kernel.tmp
-	rm kernel.bin
-	rm init.bin
-	rm display.o
-	rm idt_setup.o
-	rm memory.o
-	rm io_ports.o
-	rm pic.o
+	rm -r $(BUILD)/*
