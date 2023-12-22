@@ -8,7 +8,7 @@ extern send_command_8259_master
 extern printfmt
 
 msg:
-db `__timer_tick__[%x]\n`,0
+db `__timer_tick__[%x]`,0
 
 ctr:
 dd 0
