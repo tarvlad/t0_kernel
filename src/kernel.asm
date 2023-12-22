@@ -9,12 +9,13 @@ extern init_heap
 extern init_idt
 extern init_8259
 extern init_paging
+extern init_paging_big_pages
 
 global main
 
 
 main:
-call init_paging
+call init_paging_big_pages
 call reset_printer
 call init_heap
 call init_idt

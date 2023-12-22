@@ -1,6 +1,8 @@
 [bits 32]
 
 global init_paging
+global init_paging_big_pages
+
 extern allocate_blocks
 
 
@@ -25,7 +27,7 @@ mov [eax], ecx              ; third page table
 add eax, 4
 
 .loop_pd:                   ; all other not present
-mov [eax], 7                ; page not present
+mov dword [eax], 7          ; page not present
 add eax, 4
 cmp eax, 4096
 jne .loop_pd
@@ -41,7 +43,53 @@ add eax, 4
 cmp eax, 20480
 jne .loop_pt
 
-mov cr3, 0
+mov eax, 0
+mov cr3, eax
+mov eax, cr0
+or eax, 0x80000001
+mov cr0, eax                ; paging enabled
+ret
+
+
+; maps first 12 MiB using big pages
+init_paging_big_pages:
+xor eax, eax
+
+xor ecx, ecx
+or ecx, 7
+mov [eax], ecx
+add eax, 4
+
+mov ecx, 0x400000
+or ecx, 7
+mov [eax], ecx
+add eax, 4
+
+mov ecx, 0x800000
+or ecx, 7
+mov [eax], ecx
+add eax, 4
+
+.loop_pt:
+mov dword [eax], 0          ; page disabled
+add eax, 4
+cmp eax, 4096
+jne .loop_pt
+
+mov dword [eax], 135        ; page size 4 MiB, supervisor, read write, present
+add eax, 4
+
+.loop_pd:
+mov dword [eax], 0
+add eax, 4
+cmp eax, 8192
+jne .loop_pd
+
+mov eax, 4096
+mov cr3, eax
+mov eax, cr4
+or eax, 0x00000010
+mov cr4, eax
 mov eax, cr0
 or eax, 0x80000001
 mov cr0, eax                ; paging enabled

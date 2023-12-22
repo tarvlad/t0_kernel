@@ -3,7 +3,7 @@
 make all
 
 qemu-system-i386 \
-    -cpu 486 \
+    -cpu pentium2 \
     -m 32m \
     -fda build/boot.img \
     -monitor stdio \
