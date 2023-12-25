@@ -57,6 +57,12 @@ xor eax, eax
 mov dword [eax], 135        ; page size 4 MiB, supervisor, read write, present
 add eax, 4
 
+mov dword [eax], 135
+add eax, 4
+
+mov dword [eax], 135
+add eax, 4
+
 .loop_pd:
 mov dword [eax], 0
 add eax, 4
