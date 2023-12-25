@@ -27,7 +27,7 @@ mov [eax], ecx              ; third page table
 add eax, 4
 
 .loop_pd:                   ; all other not present
-mov dword [eax], 7          ; page not present
+mov dword [eax], 0          ; page not present
 add eax, 4
 cmp eax, 4096
 jne .loop_pd
